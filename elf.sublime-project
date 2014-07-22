@@ -1,0 +1,13 @@
+{
+    "folders":
+    [
+        {
+            "path": "~/dev/elf",
+            "file_exclude_patterns": ["*.pyc", "*/static/*", "google_appengine/*"]
+        }
+    ],
+    "settings":
+    {
+        "tab_size": 4
+    }
+}
