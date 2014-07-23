@@ -80,14 +80,63 @@ def ajax_request(function):
     return wrapper
 
 
+class WarmupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=10)
+    def get(self):
+        self.response.write('Warmed up!')
+
+
 class IndexHandler(webapp2.RequestHandler):
-    @rate_limit(seconds_per_request=5)
+    @rate_limit(seconds_per_request=1)
     @render_to('index.html')
     def get(self):
         return {}
 
 
-class WarmupHandler(webapp2.RequestHandler):
-    @rate_limit(seconds_per_request=10)
+class CreateGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('create_group.html')
     def get(self):
-        self.response.write('Warmed up!')
+        return {}
+
+
+class OpenGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('open_group.html')
+    def get(self):
+        return {}
+
+
+class BuildGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('build_group.html')
+    def get(self, group_id):
+        return {}
+
+
+class JoinGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('join_group.html')
+    def get(self, group_id):
+        return {}
+
+
+class TweakGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('tweak_group.html')
+    def get(self, group_id):
+        return {}
+
+
+class ReviewAssignmentsHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('review_assignments.html')
+    def get(self, group_id):
+        return {}
+
+
+class AssignmentsSentHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @render_to('assignments_sent.html')
+    def get(self, group_id):
+        return {}

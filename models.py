@@ -1,4 +1,7 @@
+import base64
+import random
 import re
+import struct
 
 from email.utils import parseaddr
 from google.appengine.ext import ndb
@@ -14,13 +17,23 @@ NEGATIVE_CONSTRAINTS_KEY = 'negativeConstraints'
 ASSIGNMENTS_KEY = 'assignments'
 
 
+def generate_id():
+    numeric_id = random.getrandbits(64) - 2 ** 63
+    return base64.urlsafe_b64encode(struct.pack('q', numeric_id))[:-1]
+
+
+def validate_name(name):
+    if len(name) > 100:
+        raise Exception('Name is too long!')
+
+
 def validate_email(email):
     if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-        raise Exception('Invalid email: %s' % email)
+        raise Exception('Invalid email: %s!' % email)
 
 
 class User(ndb.Model):
-    name = ndb.StringProperty(required=True, indexed=False)
+    name = ndb.StringProperty(required=True, indexed=False, validator=validate_name)
     email = ndb.StringProperty(required=True, indexed=False, validator=validate_email)
 
     def to_dict(self):
@@ -41,8 +54,8 @@ class Assignment(ndb.Model):
         }
 
 
-class Party(ndb.Model):
-    name = ndb.StringProperty(required=True, indexed=False)
+class Group(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=False, validator=validate_name)
     users = ndb.StructuredProperty(User, repeated=True)
     positive_constraints = ndb.StructuredProperty(Assignment, repeated=True)
     negative_constraints = ndb.StructuredProperty(Assignment, repeated=True)
@@ -50,6 +63,7 @@ class Party(ndb.Model):
 
     def to_dict(self):
         return {
+            NAME_KEY: self.name,
             USERS_KEY: [user.to_dict() for user in self.users],
             ASSIGNMENTS_KEY: [assignment.to_dict() for assignment in self.assignments],
         }
