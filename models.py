@@ -42,6 +42,7 @@ class Assignment(ndb.Model):
 
 
 class Party(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=False)
     users = ndb.StructuredProperty(User, repeated=True)
     positive_constraints = ndb.StructuredProperty(Assignment, repeated=True)
     negative_constraints = ndb.StructuredProperty(Assignment, repeated=True)
