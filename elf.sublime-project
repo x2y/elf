@@ -3,11 +3,18 @@
     [
         {
             "path": "~/dev/elf",
-            "file_exclude_patterns": ["*.pyc", "*/static/*", "google_appengine/*"]
+            "file_exclude_patterns":
+            [
+                "*.pyc",
+                "*/static/jquery*",
+                "google_appengine/*",
+                "less/bootstrap/*",
+                "less/node_modules/*"
+            ]
         }
     ],
     "settings":
     {
-        "tab_size": 4
+        "tab_size": 2
     }
 }

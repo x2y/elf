@@ -140,3 +140,24 @@ class AssignmentsSentHandler(webapp2.RequestHandler):
     @render_to('assignments_sent.html')
     def get(self, group_id):
         return {}
+
+
+class AjaxCreateGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @ajax_request
+    def post(self):
+        name = self.request.POST[NAME_KEY].strip()
+        if not name:
+            return {ERRORS_KEY: 'We\'re gonna need a name for your group.'}
+
+        admin_email = self.request.POST[ADMIN_EMAIL_KEY].strip()
+        if not admin_email:
+            return {ERRORS_KEY: 'We\'re gonna need an email for your group\'s coordinator.'}
+
+        try:
+            group = Group(key=ndb.Key(Group, generate_id()), name=name, admin_email=admin_email)
+            group.put()
+        except Exception as e:
+            return {ERRORS_KEY: e.message}
+
+        return group.to_dict()

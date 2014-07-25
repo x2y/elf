@@ -7,14 +7,16 @@ from email.utils import parseaddr
 from google.appengine.ext import ndb
 
 
-NAME_KEY = 'name'
+ADMIN_EMAIL_KEY = 'adminEmail'
+ASSIGNMENTS_KEY = 'assignments'
 EMAIL_KEY = 'email'
 GIVER_EMAIL_KEY = 'giverEmail'
+KEY_KEY = 'key'
+NAME_KEY = 'name'
+NEGATIVE_CONSTRAINTS_KEY = 'negativeConstraints'
+POSITIVE_CONSTRAINTS_KEY = 'positiveConstraints'
 RECEIVER_EMAIL_KEY = 'receiverEmail'
 USERS_KEY = 'users'
-POSITIVE_CONSTRAINTS_KEY = 'positiveConstraints'
-NEGATIVE_CONSTRAINTS_KEY = 'negativeConstraints'
-ASSIGNMENTS_KEY = 'assignments'
 
 
 def generate_id():
@@ -27,30 +29,34 @@ def generate_id():
     return base64.urlsafe_b64encode(struct.pack('q', numeric_id))[:-1]
 
 
-def validate_name(name):
+def validate_name(property, name):
     """Validate the specified name, throwing an exception if invalid.
 
     Args:
+        property: The property being validated.
         name: The name to validate.
 
     Raises:
         Exception: If the name is too long.
     """
-    if len(name) > 100:
-        raise Exception('Name is too long!')
+    if len(name) > 128:
+        raise Exception('That\'s too long of a name.')
 
 
-def validate_email(email):
+def validate_email(property, email):
     """Validate the specified email, throwing an exception if invalid.
 
     Args:
+        property: The property being validated.
         email: The email to validate.
 
     Raises:
         Exception: If the email does not match a basic email format.
     """
-    if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-        raise Exception('Invalid email: %s!' % email)
+    if len(email) > 128:
+        raise Exception('That\'s too long of an email.')
+    elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        raise Exception('%s is not a valid email address.' % email)
 
 
 class User(ndb.Model):
@@ -85,6 +91,7 @@ class Group(ndb.Model):
     """A model for a single group of users, their constraints, and their assignments."""
 
     name = ndb.StringProperty(required=True, indexed=False, validator=validate_name)
+    admin_email = ndb.StringProperty(required=True, indexed=False, validator=validate_email)
     users = ndb.StructuredProperty(User, repeated=True)
     positive_constraints = ndb.StructuredProperty(Assignment, repeated=True)
     negative_constraints = ndb.StructuredProperty(Assignment, repeated=True)
@@ -93,6 +100,7 @@ class Group(ndb.Model):
     def to_dict(self):
         """Convert the group to an easily-serializable dict."""
         return {
+            KEY_KEY: self.key.id(),
             NAME_KEY: self.name,
             USERS_KEY: [user.to_dict() for user in self.users],
             ASSIGNMENTS_KEY: [assignment.to_dict() for assignment in self.assignments],

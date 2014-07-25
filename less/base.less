@@ -1,0 +1,44 @@
+@import "bootstrap/less/bootstrap.less";
+@import "bootstrap/less/theme.less";
+@import "custom-bootstrap-variables.less";
+
+@banner-height: 300px;
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  .btn;
+  .btn-default;
+}
+
+.banner {
+  background-color: rgba(0, 0, 0, 0.9);
+  box-shadow: #000 2px 2px 13px;
+  display: none;
+  height: @banner-height;
+  margin-top: -@banner-height / 2;
+  opacity: 1;
+  position: fixed;
+  top: 50%;
+  width: 100%;
+
+  .banner-text {
+    bottom: 50px;
+    color: white;
+    left: 75px;
+    position: absolute;
+    right: 75px;
+    text-align: center;
+    text-shadow: #000 0px 3px 10px, rgba(0, 0, 0, 0.3) 0px 0px 30px;
+    top: 50px;
+  }
+}
+
+.template {
+  display: none;
+}
+
+// This line should always be last.
+@import "bootstrap/less/utilities.less";
