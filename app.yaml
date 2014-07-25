@@ -31,3 +31,4 @@ skip_files:
 - ^(.*/)?.*/RCS/.*$
 - ^(.*/)?\..*$
 - ^google_appengine\.*$
+- ^less\.*$
