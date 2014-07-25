@@ -10,7 +10,7 @@ fi
 ORIGINAL_PATH=$(pwd)
 ROOT=$(echo "$ORIGINAL_PATH" | grep '.*?/elf' -o -P | head -1)
 
-cd $ROOT/media/less/
+cd $ROOT/less/
 
 rm -rf ./bootstrap/
 git clone git://github.com/twbs/bootstrap.git bootstrap
@@ -18,5 +18,9 @@ git add bootstrap/
 
 cd bootstrap/
 git checkout $1
+nodejs /usr/bin/npm install
+
+cd ..
+ln -s bootstrap/node_modules/ node_modules
 
 cd $ORIGINAL_PATH
