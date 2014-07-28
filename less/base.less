@@ -4,13 +4,25 @@
 
 @banner-height: 300px;
 
-* {
-  box-sizing: border-box;
-}
-
 button {
   .btn;
   .btn-default;
+}
+
+button:active,
+button:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+input,
+select,
+textarea {
+  .form-control;
 }
 
 .banner {
@@ -36,8 +48,47 @@ button {
   }
 }
 
-.template {
-  display: none;
+.user-fields {
+  .list-unstyled;
+
+  li {
+    .form-group;
+
+    &:first-of-type .delete {
+      display: none;
+    }
+
+    .email-textbox,
+    .name-textbox {
+      .input-lg;
+      display: inline-block;
+      width: 300px;
+    }
+
+    .delete {
+      .btn-lg;
+      -webkit-appearance: none;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      color: #000;
+      opacity: .4;
+      padding: @padding-large-vertical 8px;
+
+      &:hover {
+        opacity: .7;
+      }
+
+      &:active {
+        opacity: .5;
+      }
+
+      > span {
+        .glyphicon;
+        .glyphicon-trash;
+      }
+    }
+  }
 }
 
 // This line should always be last.

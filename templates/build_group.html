@@ -1,7 +1,43 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Elf{% endblock %}
 
+
+{% block head %}
+{{ super() }}
+{% raw %}
+<script id="user-template" type="text/x-handlebars-template">
+  <li>
+    <input class="name-textbox" type="text" maxlength="128" placeholder="Name" value="{{name}}">
+    <input class="email-textbox" type="text" maxlength="128" placeholder="Email address" value="{{email}}">
+    <button class="delete"><span></span></button>
+  </li>
+</script>
+{% endraw %}
+{% endblock %}
+
+
 {% block content %}
-Build group
+{{ super() }}
+<ul class="user-fields"></ul>
+<button class="add-button">Add</button>
+{% endblock %}
+
+
+{% block foot %}
+{{ super() }}
+<script>
+  var userTemplate;
+
+  $(function() {
+    userTemplate = Handlebars.compile($("#user-template").html());
+
+    $('.add-button').click(addUser);
+  });
+
+  function addUser() {
+    $('.user-fields').append(userTemplate({}));
+  }
+</script>
 {% endblock %}
