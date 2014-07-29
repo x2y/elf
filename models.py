@@ -92,6 +92,7 @@ class Group(ndb.Model):
 
     name = ndb.StringProperty(required=True, indexed=False, validator=validate_name)
     admin_email = ndb.StringProperty(required=True, indexed=False, validator=validate_email)
+    version = ndb.DateTimeProperty(required=True, indexed=False, auto_now=True)
     users = ndb.StructuredProperty(User, repeated=True)
     positive_constraints = ndb.StructuredProperty(Assignment, repeated=True)
     negative_constraints = ndb.StructuredProperty(Assignment, repeated=True)
