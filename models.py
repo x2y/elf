@@ -17,6 +17,7 @@ NEGATIVE_CONSTRAINTS_KEY = 'negativeConstraints'
 POSITIVE_CONSTRAINTS_KEY = 'positiveConstraints'
 RECEIVER_EMAIL_KEY = 'receiverEmail'
 USERS_KEY = 'users'
+VERSION_KEY = 'version'
 
 
 def generate_id():
@@ -39,8 +40,10 @@ def validate_name(property, name):
     Raises:
         Exception: If the name is too long.
     """
-    if len(name) > 128:
-        raise Exception('That\'s too long of a name.')
+    if not name:
+        raise Exception('Uh-oh. You forgot a name!')
+    elif len(name) > 128:
+        raise Exception('Uh-oh. That name is too long!')
 
 
 def validate_email(property, email):
@@ -53,8 +56,10 @@ def validate_email(property, email):
     Raises:
         Exception: If the email does not match a basic email format.
     """
-    if len(email) > 128:
-        raise Exception('That\'s too long of an email.')
+    if not email:
+        raise Exception('Uh-oh. You forgot an email!')
+    elif len(email) > 128:
+        raise Exception('Uh-oh. That email is too long!')
     elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
         raise Exception('%s is not a valid email address.' % email)
 
@@ -98,11 +103,19 @@ class Group(ndb.Model):
     negative_constraints = ndb.StructuredProperty(Assignment, repeated=True)
     assignments = ndb.StructuredProperty(Assignment, repeated=True)
 
+    def _pre_put_hook(self):
+        names, emails = set(), set()
+        for user in self.users:
+            if user.name.lower() in names:
+                raise Exception('More than one member has the name "%s".' % user.name)
+            names.add(user.name.lower())
+
     def to_dict(self):
         """Convert the group to an easily-serializable dict."""
         return {
             KEY_KEY: self.key.id(),
             NAME_KEY: self.name,
+            VERSION_KEY: self.version,
             USERS_KEY: [user.to_dict() for user in self.users],
             ASSIGNMENTS_KEY: [assignment.to_dict() for assignment in self.assignments],
         }

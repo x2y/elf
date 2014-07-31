@@ -1,7 +1,9 @@
+import datetime
 import jinja2
 import json
 import logging
 import os
+import time
 import traceback
 import webapp2
 
@@ -54,11 +56,15 @@ def render_to(template=''):
 
 def json_handler(obj):
     if isinstance(obj, datetime.datetime):
-        return obj.isoformat()
+        return to_timestamp(obj)
     elif isinstance(obj, ndb.Model):
         return obj.to_dict()
     else:
         raise TypeError("%r is not JSON serializable" % obj)
+
+
+def to_timestamp(dt):
+    return int(time.mktime(dt.timetuple()))
 
 
 def to_json(value):
@@ -110,35 +116,37 @@ class OpenGroupHandler(webapp2.RequestHandler):
 class BuildGroupHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=2)
     @render_to('build_group.html')
-    def get(self, group_id):
-        return {}
+    def get(self, key):
+        return {
+            KEY_KEY: key
+        }
 
 
 class JoinGroupHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=2)
     @render_to('join_group.html')
-    def get(self, group_id):
+    def get(self, key):
         return {}
 
 
 class TweakGroupHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=2)
     @render_to('tweak_group.html')
-    def get(self, group_id):
+    def get(self, key):
         return {}
 
 
 class ReviewAssignmentsHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=2)
     @render_to('review_assignments.html')
-    def get(self, group_id):
+    def get(self, key):
         return {}
 
 
 class AssignmentsSentHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=2)
     @render_to('assignments_sent.html')
-    def get(self, group_id):
+    def get(self, key):
         return {}
 
 
@@ -156,6 +164,65 @@ class AjaxCreateGroupHandler(webapp2.RequestHandler):
 
         try:
             group = Group(key=ndb.Key(Group, generate_id()), name=name, admin_email=admin_email)
+            group.put()
+        except Exception as e:
+            return {ERRORS_KEY: e.message}
+
+        return group.to_dict()
+
+
+class AjaxGetGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=1)
+    @ajax_request
+    def get(self):
+        group = ndb.Key(Group, self.request.GET[KEY_KEY]).get()
+        if not group:
+            return {ERRORS_KEY: 'Hmm. We don\'t recognize that group.'}
+        return group.to_dict()
+
+
+class AjaxUpdateGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=1)
+    @ajax_request
+    def post(self):
+        # Load the Group.
+        group = ndb.Key(Group, self.request.POST[KEY_KEY]).get()
+        if not group:
+            return {ERRORS_KEY: 'Hmm. We don\'t recognize that group.'}
+
+        # Validate the operation.
+        if group.assignments:
+            return {ERRORS_KEY: 'I\'m sorry. You can\'t change a group\'s members after their ' +
+                                'assignments have been made.'}
+
+        # Validate the version.
+        try:
+            version = int(self.request.POST[VERSION_KEY])
+        except:
+            return {ERRORS_KEY: 'That\'s not a valid version.'}
+
+        if version != to_timestamp(group.version):
+            return {ERRORS_KEY: 'Looks like someone\'s joined the group since this you\'ve made ' +
+                                'changes. Refresh the page to load the latest members.'}
+
+        # Validate/build the user list.
+        try:
+            users = json.loads(self.request.POST.get(USERS_KEY))
+        except:
+            return {ERRORS_KEY: 'The members list is not in a valid format.'}
+
+        group.users = []
+        for user in users:
+            name, email = user[NAME_KEY].strip(), user[EMAIL_KEY].strip()
+            if not name and not email:
+                continue
+
+            try:
+                group.users.append(User(name=name, email=email))
+            except Exception as e:
+                return {ERRORS_KEY: e.message}
+
+        try:
             group.put()
         except Exception as e:
             return {ERRORS_KEY: e.message}
