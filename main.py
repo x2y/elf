@@ -18,6 +18,7 @@ app = webapp2.WSGIApplication([
     (r'^/done/%s/$' % GROUP_KEY_REGEX, AssignmentsSentHandler),
     # AJAX handlers.
     (r'^/x/create-group/$', AjaxCreateGroupHandler),
+    (r'^/x/open-group/$', AjaxOpenGroupHandler),
     (r'^/x/get-group/$', AjaxGetGroupHandler),
     (r'^/x/update-group/$', AjaxUpdateGroupHandler),
     # AppEngine handlers.

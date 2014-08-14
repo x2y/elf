@@ -96,7 +96,7 @@ class Group(ndb.Model):
     """A model for a single group of users, their constraints, and their assignments."""
 
     name = ndb.StringProperty(required=True, indexed=False, validator=validate_name)
-    admin_email = ndb.StringProperty(required=True, indexed=False, validator=validate_email)
+    admin_email = ndb.StringProperty(required=True, indexed=True, validator=validate_email)
     version = ndb.DateTimeProperty(required=True, indexed=False, auto_now=True)
     users = ndb.StructuredProperty(User, repeated=True)
     positive_constraints = ndb.StructuredProperty(Assignment, repeated=True)

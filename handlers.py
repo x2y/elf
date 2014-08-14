@@ -86,6 +86,10 @@ def ajax_request(function):
     return wrapper
 
 
+def is_name_equal(name0, name1):
+    return name0 == name1
+
+
 class WarmupHandler(webapp2.RequestHandler):
     @rate_limit(seconds_per_request=10)
     def get(self):
@@ -169,6 +173,21 @@ class AjaxCreateGroupHandler(webapp2.RequestHandler):
             return {ERRORS_KEY: e.message}
 
         return group.to_dict()
+
+
+class AjaxOpenGroupHandler(webapp2.RequestHandler):
+    @rate_limit(seconds_per_request=2)
+    @ajax_request
+    def post(self):
+        name = self.request.POST[NAME_KEY].strip()
+        admin_email = self.request.POST[ADMIN_EMAIL_KEY].strip()
+        
+        groups = Group.query(Group.admin_email == admin_email)
+        for group in groups:
+            if is_name_equal(group.name, name):
+                return group.to_dict()
+
+        return {ERRORS_KEY: 'Huh. I don\' recognize that group.'}
 
 
 class AjaxGetGroupHandler(webapp2.RequestHandler):
