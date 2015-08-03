@@ -5,7 +5,8 @@
             "path": "~/dev/elf",
             "file_exclude_patterns":
             [
-                "node_modules/*"
+                "node_modules/*",
+                "public/lib/*"
             ]
         }
     ]
