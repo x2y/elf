@@ -1,6 +1,33 @@
-*.log
-*.pot
-*.pyc
+# Node files
+.nodemonignore
+npm-debug.log
+node_modules/
+
+# App files
+public/lib
+app/tests/coverage/
+
+# Sass files
+.sass-cache/
+
+# Bower files
+.bower-*/
+
+# IntelliJ files
+.idea/
+
+# Vim files
 *.swp
 *.swo
+
+# Sublime files
 *.sublime-workspace
+
+# OSX files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
